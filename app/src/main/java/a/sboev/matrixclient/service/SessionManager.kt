@@ -1,4 +1,4 @@
-package a.sboev.matrixclient
+package a.sboev.matrixclient.service
 
 
 import com.russhwolf.settings.Settings

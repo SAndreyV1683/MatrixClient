@@ -1,4 +1,4 @@
-package a.sboev.matrixclient
+package a.sboev.matrixclient.ui
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background

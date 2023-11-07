@@ -1,6 +1,6 @@
 package io.terrakok.smalk.service
 
-import a.sboev.matrixclient.AndroidApp
+import a.sboev.matrixclient.MatrixApp
 import android.content.Context
 import android.graphics.BitmapFactory
 import androidx.compose.ui.graphics.ImageBitmap
@@ -19,7 +19,7 @@ import org.koin.core.module.Module
 import java.text.SimpleDateFormat
 
 fun getPlatformSettings(): Settings = SharedPreferencesSettings(
-    AndroidApp.INSTANCE.getSharedPreferences("SmalkPreferences", Context.MODE_PRIVATE)
+    MatrixApp.INSTANCE.getSharedPreferences("SmalkPreferences", Context.MODE_PRIVATE)
 )
 
 fun ByteArray.asImageBitmap(): ImageBitmap =
@@ -33,7 +33,7 @@ fun createDateFormat(pattern: String) = object : (Instant) -> String {
 }
 
 private fun getCacheDirectoryPath(): Path =
-    AndroidApp.INSTANCE.cacheDir.absolutePath.toPath().resolve("cache")
+    MatrixApp.INSTANCE.cacheDir.absolutePath.toPath().resolve("cache")
 
 suspend fun getPlatformRepositoryModule(): Module = createRealmRepositoriesModule {
     directory(getCacheDirectoryPath().resolve("realm").toString())

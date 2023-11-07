@@ -1,19 +1,23 @@
 package a.sboev.matrixclient.viewmodels
 
-
-import a.sboev.matrixclient.MatrixApp
-import a.sboev.matrixclient.ui.RoomHeader
+import a.sboev.matrixclient.getSubTree
 import a.sboev.matrixclient.isRoot
 import a.sboev.matrixclient.isSpace
 import a.sboev.matrixclient.nameFlow
-import android.util.Log
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.initializer
-import androidx.lifecycle.viewmodel.viewModelFactory
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.*
+import a.sboev.matrixclient.ui.RoomHeader
+import cafe.adriel.voyager.core.model.ScreenModel
+import cafe.adriel.voyager.core.model.coroutineScope
+
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Instant
 import net.folivo.trixnity.client.MatrixClient
@@ -22,14 +26,18 @@ import net.folivo.trixnity.client.room.flatten
 import net.folivo.trixnity.client.store.Room
 import net.folivo.trixnity.client.store.sender
 import net.folivo.trixnity.client.user
+import net.folivo.trixnity.core.model.RoomId
 import net.folivo.trixnity.core.model.events.m.room.MemberEventContent
 import net.folivo.trixnity.core.model.events.m.room.RoomMessageEventContent
 
-@OptIn(ExperimentalCoroutinesApi::class)
-class ChatsViewModel(val client: MatrixClient): ViewModel() {
-
+class HomeViewScreenModel(
+    val client: MatrixClient
+) : ScreenModel {
     private val chatsState = MutableStateFlow(listOf<RoomHeader>())
     val chats: StateFlow<List<RoomHeader>> get() = chatsState
+
+    private val catalogState = MutableStateFlow(listOf<RoomHeader>())
+    val catalog: StateFlow<List<RoomHeader>> get() = catalogState
 
     init {
         val roomService = client.room
@@ -39,30 +47,26 @@ class ChatsViewModel(val client: MatrixClient): ViewModel() {
                 val headers = rooms.map { it.headerFlow() }
                 combine(headers) { it.asList() }
             }
-            .shareIn(viewModelScope, SharingStarted.WhileSubscribed(), 1)
+            .shareIn(coroutineScope, SharingStarted.WhileSubscribed(), 1)
 
         val chatsFlow = allHeaders.map { headers ->
             headers
                 .filter { !it.isSpace && roomService.isRoot(it.id) }
                 .sortedByDescending { it.lastMessageDate }
-
         }
-        viewModelScope.launch {
-            chatsFlow.collect { chatsState.value = it }
-        }
-    }
-
-    companion object {
-        val Factory: ViewModelProvider.Factory = viewModelFactory {
-            initializer {
-                val application = MatrixApp.INSTANCE
-                ChatsViewModel(client = application.client)
+        val catalogFlow = allHeaders.map { headers ->
+            val sortedCatalog = mutableListOf<RoomId>()
+            val catalogRoots = headers.filter { it.isSpace && roomService.isRoot(it.id) }
+            catalogRoots.forEach { root ->
+                sortedCatalog.add(root.id)
+                sortedCatalog.addAll(roomService.getSubTree(root.id))
             }
+            val index = headers.associateBy { it.id }
+            sortedCatalog.mapNotNull { index[it] }
         }
-        val TAG = ChatsViewModel::class.simpleName
+        coroutineScope.launch { chatsFlow.collect { chatsState.value = it } }
+        coroutineScope.launch { catalogFlow.collect { catalogState.value = it } }
     }
-
-
 
     private fun Room.headerFlow(): Flow<RoomHeader> {
         val initFlow = flow {
