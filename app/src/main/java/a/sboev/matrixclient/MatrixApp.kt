@@ -33,7 +33,7 @@ class MatrixApp : Application(), KoinComponent {
         lateinit var INSTANCE: MatrixApp
         private val TAG = MatrixApp::class.simpleName
     }
-    private val clientSyncStateFlow = MutableStateFlow(SyncState.INITIAL_SYNC)
+    private val clientSyncStateFlow = MutableStateFlow(SyncState.STOPPED)
     val clientSyncState = clientSyncStateFlow.asStateFlow()
     override fun onCreate() {
         coroutineScope.launch {

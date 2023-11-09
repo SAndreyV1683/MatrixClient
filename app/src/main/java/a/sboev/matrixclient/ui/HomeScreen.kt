@@ -8,16 +8,23 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Chat
+import androidx.compose.material.icons.outlined.FolderCopy
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
 import androidx.compose.material3.DividerDefaults
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.movableContentOf
@@ -31,7 +38,11 @@ import cafe.adriel.voyager.core.model.rememberScreenModel
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.core.screen.uniqueScreenKey
 import cafe.adriel.voyager.navigator.CurrentScreen
+import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.Navigator
+import cafe.adriel.voyager.navigator.currentOrThrow
+import kotlinx.coroutines.flow.onEach
+import net.folivo.trixnity.client.MatrixClient
 import net.folivo.trixnity.clientserverapi.client.SyncState
 import net.folivo.trixnity.core.model.RoomId
 import org.koin.core.component.KoinComponent
@@ -44,9 +55,9 @@ class HomeScreen : Screen, KoinComponent {
     override fun Content() {
         val sessionManager by inject<SessionManager>()
         val client = sessionManager.getClient()
-        /*val navigator = LocalNavigator.currentOrThrow
+        val navigator = LocalNavigator.currentOrThrow
 
-        LaunchedEffect(Unit) {
+        /*LaunchedEffect(Unit) {
             client.startSync()
             client.loginState.onEach { loginState ->
                 when (loginState) {
@@ -55,14 +66,14 @@ class HomeScreen : Screen, KoinComponent {
                     }
 
                     MatrixClient.LoginState.LOGGED_OUT -> {
-                        //navigator.replaceAll(LoginScreen())
+                        navigator.replaceAll(LoginScreen())
                     }
 
                     else -> {
                         //no-op
                     }
                 }
-            }.collect()
+            }
         }*/
 
         var selectedRoomId: RoomId? by remember { mutableStateOf(null) }
@@ -122,7 +133,7 @@ class HomeScreen : Screen, KoinComponent {
         Scaffold(
             topBar = {
                 Surface(shadowElevation = 3.dp) {
-                    HomeTopBar(sessionManager.getClient(), syncState)
+                    HomeTopBar(client, syncState)
                 }
             },
             content = { innerPadding ->
@@ -156,8 +167,8 @@ class HomeScreen : Screen, KoinComponent {
                     }
                 }
             },
-            bottomBar = {/*
-                SmallNavigationBar {
+            bottomBar = {
+                /*SmallNavigationBar {
                     NavigationBarItem(
                         selected = showChats,
                         onClick = { showChats = true },

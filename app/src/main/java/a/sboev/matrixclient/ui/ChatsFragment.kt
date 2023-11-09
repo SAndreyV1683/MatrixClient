@@ -122,7 +122,7 @@ class ChatsFragment : Fragment() {
         val chatsViewModel: ChatsViewModel = viewModel(factory = ChatsViewModel.Factory)
         val chats = chatsViewModel.chats.collectAsState()
         val syncState by chatsViewModel.client.syncState.collectAsState()
-        Log.d(TAG, "chats list" + chats.value.toString())
+
         Scaffold(
             topBar = {
                 Surface(shadowElevation = 3.dp) {

@@ -12,6 +12,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
+import cafe.adriel.voyager.core.model.coroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -45,11 +46,13 @@ class ChatsViewModel(val client: MatrixClient): ViewModel() {
             headers
                 .filter { !it.isSpace && roomService.isRoot(it.id) }
                 .sortedByDescending { it.lastMessageDate }
-
         }
+
         viewModelScope.launch {
             chatsFlow.collect { chatsState.value = it }
         }
+
+
     }
 
     companion object {
@@ -98,6 +101,7 @@ class ChatsViewModel(val client: MatrixClient): ViewModel() {
         val lastMsgFlow = combine(user, message, date) { u, m, d -> LastMsg(d, u?.name.orEmpty(), m.orEmpty()) }
 
         return combine(initFlow, nameFlow, lastMsgFlow) { header, name, msg ->
+            Log.d(TAG, "header ${header.id} name $name ${msg.text}")
             header.copy(title = name, lastMessageText = "${msg.userName}: ${msg.text}", lastMessageDate = msg.date)
         }
     }

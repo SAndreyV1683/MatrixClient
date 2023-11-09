@@ -28,15 +28,12 @@ class MainActivity : AppCompatActivity() {
             sync.collect{
                 Log.d(TAG, "sync state $it")
                 when (it) {
-                    SyncState.RUNNING -> {
+                    SyncState.STARTED -> {
                         supportFragmentManager.beginTransaction().replace(R.id.content, ChatsFragment()).commit()
                     }
                     else -> {}
                 }
             }
         }
-
-
-
     }
 }
