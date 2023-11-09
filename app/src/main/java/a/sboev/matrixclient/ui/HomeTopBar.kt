@@ -1,5 +1,6 @@
 package a.sboev.matrixclient.ui
 
+import a.sboev.matrixclient.service.SessionManager
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.People
 import androidx.compose.material3.AlertDialog
@@ -29,8 +30,9 @@ import net.folivo.trixnity.core.model.UserId
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeTopBar(client: MatrixClient, syncState: SyncState) {
+fun HomeTopBar(sessionManager: SessionManager, syncState: SyncState) {
     val scope = rememberCoroutineScope()
+    val client = sessionManager.getClient()
     CenterAlignedTopAppBar(
         title = {
             val stateName = when (syncState) {
@@ -55,7 +57,9 @@ fun HomeTopBar(client: MatrixClient, syncState: SyncState) {
                     confirmButton = {
                         Button(onClick = {
                             showLogoutDialog = false
-
+                            scope.launch {
+                                sessionManager.logout()
+                            }
                         }) {
                             Text("Logout")
                         }
@@ -79,7 +83,7 @@ fun HomeTopBar(client: MatrixClient, syncState: SyncState) {
                     scope.launch {
                         client.api.rooms.createRoom(
                             visibility = DirectoryVisibility.PRIVATE,
-                            name = "test2",
+                            name = "test3",
                             topic = "toTestRoom",
                             invite = setOf(UserId("@sboev2:matrix-server-dev"))
                         )

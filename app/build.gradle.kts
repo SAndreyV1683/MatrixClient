@@ -73,7 +73,7 @@ dependencies {
     implementation("net.folivo:trixnity-client-media-okio:3.10.4")
 
     //compose
-    implementation("cafe.adriel.voyager:voyager-navigator:1.0.0-rc09")
+    implementation("cafe.adriel.voyager:voyager-navigator:1.0.0-rc07")
     implementation("androidx.compose.material3:material3-android:1.2.0-alpha10")
     implementation("androidx.compose.material:material-icons-extended:1.5.4")
     implementation("androidx.activity:activity-compose:1.8.0")

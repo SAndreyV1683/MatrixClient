@@ -40,7 +40,7 @@ object EmptyRoomScreen : Screen {
         } else {
             Text(
                 modifier = Modifier.fillMaxSize().wrapContentHeight(),
-                text = "Select chat",
+                text = "",
                 textAlign = TextAlign.Center
             )
         }

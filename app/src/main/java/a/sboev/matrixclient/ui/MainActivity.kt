@@ -28,7 +28,7 @@ class MainActivity : AppCompatActivity() {
             sync.collect{
                 Log.d(TAG, "sync state $it")
                 when (it) {
-                    SyncState.STARTED -> {
+                    SyncState.RUNNING -> {
                         supportFragmentManager.beginTransaction().replace(R.id.content, ChatsFragment()).commit()
                     }
                     else -> {}
