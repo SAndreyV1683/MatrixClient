@@ -62,7 +62,7 @@ data class RoomHeader(
                     else -> roomEventContent::class.simpleName
                 }
             }
-
+            
             val resultMsg = message.combine(user){ m, u -> "${u?.name}: $m"}
             resultMsg.collect {
                 lastMessage = it

@@ -24,6 +24,7 @@ import cafe.adriel.voyager.navigator.currentOrThrow
 import io.github.aakira.napier.Napier
 import kotlinx.coroutines.launch
 import net.folivo.trixnity.client.MatrixClient
+import net.folivo.trixnity.core.model.EventId
 import net.folivo.trixnity.core.model.RoomId
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
@@ -126,6 +127,14 @@ class RoomScreen(val id: String) : Screen, KoinComponent {
         val timelineItems by screenModel.items.collectAsState()
         val isLoadingBefore by screenModel.isLoadingBefore.collectAsState()
 
+        LaunchedEffect(timelineItems) {
+            scope.launch {
+                for (event in timelineItems) {
+                    client.api.rooms.setReadMarkers(roomId, read = EventId(event.id))
+                }
+            }
+        }
+
         LazyColumn(
             modifier = Modifier.fillMaxSize().padding(horizontal = 8.dp),
             contentPadding = paddingValues,
@@ -142,6 +151,7 @@ class RoomScreen(val id: String) : Screen, KoinComponent {
                     }
                 }
                 element.render(client)
+
             }
             item {
                 if (isLoadingBefore) {

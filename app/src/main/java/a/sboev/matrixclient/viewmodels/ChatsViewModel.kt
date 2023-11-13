@@ -9,7 +9,12 @@ import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import kotlinx.coroutines.launch
 import net.folivo.trixnity.client.MatrixClient
+import net.folivo.trixnity.client.room
+import net.folivo.trixnity.client.user
+import net.folivo.trixnity.clientserverapi.model.sync.Sync
+import net.folivo.trixnity.core.model.EventId
 import net.folivo.trixnity.core.model.RoomId
+import net.folivo.trixnity.core.model.events.RoomAccountDataEventContent
 
 
 class ChatsViewModel(val client: MatrixClient): ViewModel() {
@@ -25,11 +30,7 @@ class ChatsViewModel(val client: MatrixClient): ViewModel() {
 
     fun setReadMarkers(roomId: RoomId) {
         viewModelScope.launch {
-            //
+
         }
     }
-
-
-
-
 }
